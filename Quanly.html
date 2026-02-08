@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý xếp hàng</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+button { padding: 10px 15px; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<p>[Đang xử lý] <b id="dang"></b></p>
+<p>[Tiếp theo] <b id="tieptheo"></b></p>
+<p>[Hàng đợi] <b id="hangdoi"></b> xe</p>
+
+<button onclick="hoanThanh()">HOÀN THÀNH</button>
+
+<script>
+function capNhat() {
+  let dang = Number(localStorage.getItem("dangXuLy") || 0);
+  let max = Number(localStorage.getItem("soHienTai") || 0);
+
+  document.getElementById("dang").innerText =
+    dang ? "BH-" + String(dang).padStart(3,'0') : "—";
+
+  document.getElementById("tieptheo").innerText =
+    dang+1 <= max ? "BH-" + String(dang+1).padStart(3,'0') : "—";
+
+  document.getElementById("hangdoi").innerText =
+    max - dang;
+}
+
+function hoanThanh() {
+  let dang = Number(localStorage.getItem("dangXuLy") || 0);
+  localStorage.setItem("dangXuLy", dang + 1);
+  capNhat();
+}
+
+capNhat();
+setInterval(capNhat, 1000);
+</script>
+
+</body>
+</html>
