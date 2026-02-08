@@ -2,70 +2,94 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Hệ thống xếp số</title>
+<title>Đăng ký số thứ tự</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-  text-align: center;
-  padding: 20px;
-}
-.box {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 420px;
-  margin: auto;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-.big {
-  font-size: 42px;
-  font-weight: bold;
-  color: #d32f2f;
-}
-.status {
-  margin-top: 10px;
-  font-size: 18px;
-}
-.btn {
-  margin-top: 20px;
-  padding: 12px 25px;
-  font-size: 18px;
-  background: #2e7d32;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-}
-.queue {
-  margin-top: 15px;
-  color: #555;
-}
+body { font-family: Arial; padding: 20px; }
+.box { border: 1px solid #ccc; padding: 15px; max-width: 360px; }
+.big { font-size: 22px; font-weight: bold; }
+.alert { color: green; font-weight: bold; display: none; }
+button { padding: 10px; font-size: 16px; margin-top: 10px; }
 </style>
 </head>
-
 <body>
+
 <div class="box">
-  <h2>HỆ THỐNG XẾP SỐ</h2>
+  <button onclick="laySo()">📌 LẤY SỐ THỨ TỰ</button>
 
-  <p>SỐ CỦA BẠN</p>
-  <div class="big">BH-05</div>
-
-  <p class="queue">Còn <b>2</b> xe trước bạn</p>
-  <p>⏳ Thời gian chờ: ~18 phút</p>
-
-  <div class="status">
-    👉 Khi đến lượt, hệ thống sẽ báo  
-    <br><b>[ĐANG XỬ LÝ]</b> BH-01
+  <div id="info" style="display:none;">
+    <div class="big">SỐ CỦA BẠN: <span id="so"></span></div>
+    <p>Còn <span id="con"></span> xe trước bạn</p>
+    <p>Thời gian chờ: ~ <input id="tg" value="18" style="width:40px"> phút</p>
+    <p>👉 Khi đến lượt, hệ thống sẽ báo</p>
+    <p class="alert" id="denluot">✅ ĐẾN LƯỢT – MỜI BẠN ĐẾN TIỆM</p>
   </div>
-
-  <div class="queue">
-    [TIẾP THEO] BH-01 <br>
-    [HÀNG ĐỢI] 1 xe
-  </div>
-
-  <button class="btn">HOÀN THÀNH</button>
 </div>
+
+<script>
+function laySo() {
+  let so = localStorage.getItem("soHienTai") || 0;
+  so++;
+  localStorage.setItem("soHienTai", so);
+  localStorage.setItem("soKhach", so);
+
+  document.getElementById("so").innerText = "BH-" + String(so).padStart(3,'0');
+  document.getElementById("con").innerText = so - (localStorage.getItem("dangXuLy") || 0) - 1;
+  document.getElementById("info").style.display = "block";
+}
+
+setInterval(() => {
+  let dang = localStorage.getItem("dangXuLy");
+  let soKhach = localStorage.getItem("soKhach");
+  if (dang && soKhach && dang == soKhach) {
+    document.getElementById("denluot").style.display = "block";
+  }
+}, 1000);
+</script>
+
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý xếp hàng</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+button { padding: 10px 15px; font-size: 16px; }
+</style>
+</head>
+<body>
 
+<p>[Đang xử lý] <b id="dang"></b></p>
+<p>[Tiếp theo] <b id="tieptheo"></b></p>
+<p>[Hàng đợi] <b id="hangdoi"></b> xe</p>
 
+<button onclick="hoanThanh()">HOÀN THÀNH</button>
+
+<script>
+function capNhat() {
+  let dang = Number(localStorage.getItem("dangXuLy") || 0);
+  let max = Number(localStorage.getItem("soHienTai") || 0);
+
+  document.getElementById("dang").innerText =
+    dang ? "BH-" + String(dang).padStart(3,'0') : "—";
+
+  document.getElementById("tieptheo").innerText =
+    dang+1 <= max ? "BH-" + String(dang+1).padStart(3,'0') : "—";
+
+  document.getElementById("hangdoi").innerText =
+    max - dang;
+}
+
+function hoanThanh() {
+  let dang = Number(localStorage.getItem("dangXuLy") || 0);
+  localStorage.setItem("dangXuLy", dang + 1);
+  capNhat();
+}
+
+capNhat();
+setInterval(capNhat, 1000);
+</script>
+
+</body>
+</html>
